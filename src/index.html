@@ -1,0 +1,38 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'none'; img-src 'self' data:"><title>FOSO Scale Connector</title><link rel="stylesheet" href="style.css"></head>
+<body><div class="shell">
+<header class="top"><div class="brand"><div class="brandicon">⚖</div><div><h1>FOSO Scale Connector</h1><p>Kết nối cân SI-SMART LABEL · RS232 / TCP / LAN / Wi-Fi</p></div></div><span class="pill" id="connection">Đang khởi tạo</span></header>
+<main>
+<div class="left">
+<section class="weightpanel"><div class="section-label">TRỌNG LƯỢNG HIỆN TẠI</div><div class="weight"><span id="weight">---.---</span><span class="kg">kg</span></div><div id="weight-status" class="weightstatus">Đang chờ dữ liệu từ cân</div><div class="statrow"><div><label>TRẠNG THÁI CÂN</label><strong id="stable">Chưa có</strong></div><div><label>KIỂU TRỌNG LƯỢNG</label><strong id="kind">---</strong></div><div><label>NGUỒN DỮ LIỆU</label><strong id="scale-ip">---</strong></div></div></section>
+<section class="card"><div class="hrow"><h2>Xuất dữ liệu vào Excel / Web</h2><span class="small-muted">Windows</span></div><p class="hint">Chọn ô Input trong Excel/Web, rồi dùng phím tắt hoặc chế độ tự nhập.</p><label class="toggle"><input id="keyboardArmed" type="checkbox"><span class="toggle-ui"></span><span>Cho phép giả lập bàn phím <small>(tắt mặc định mỗi lần mở)</small></span></label><div class="hotkeys"><div><b>Ctrl + Alt + W</b><small>Gõ số kg đang ổn định vào ô đang chọn</small></div><button class="secondary" id="delayType">Gõ sau 3 giây</button></div><p class="warning">Chỉ bật khi đang làm việc với đúng ô Input. Chế độ tự nhập không phân biệt Excel hay ứng dụng khác đang được chọn.</p></section>
+<section class="card logcard"><div class="hrow"><h2>Nhật ký kết nối</h2><button class="ghost" id="clearLog">Xóa hiển thị</button></div><div id="log" class="logs"></div></section>
+</div>
+<div class="right">
+<form id="settings" class="card"><div class="hrow"><h2>Cấu hình thiết bị</h2><span class="small-muted">Lưu theo máy</span></div><label>Kiểu kết nối với cân<select name="connectionType" id="connectionType"><option value="tcp">TCP / LAN / Wi-Fi</option><option value="serial">RS232 (COM Port)</option></select></label>
+<div id="tcpSettings"><div class="fieldrow"><label>IP máy tính nhận cân<input name="listenHost" placeholder="0.0.0.0" required></label><label>TCP Port<input name="port" type="number" min="1024" max="65535" required></label></div><label>Chỉ cho phép IP cân này (tùy chọn)<input name="allowedScaleIp" placeholder="VD: 192.168.1.120"></label></div>
+<div id="serialSettings" hidden>
+  <div class="fieldrow"><label>COM Port<input name="serialPath" placeholder="COM3" required></label><label>Baud rate<select name="serialBaudRate"><option>1200</option><option>2400</option><option>4800</option><option>9600</option><option>19200</option><option>38400</option><option>57600</option><option>115200</option></select></label></div>
+  <button type="button" class="secondary" id="refreshPorts">Quét cổng COM</button><div id="portsInfo" class="small-muted" style="margin-top:7px"></div>
+  <div class="fieldrow"><label>Data bits<select name="serialDataBits"><option>8</option><option>7</option></select></label><label>Parity<select name="serialParity"><option value="none">None</option><option value="even">Even</option><option value="odd">Odd</option></select></label></div>
+  <label>Stop bits<select name="serialStopBits"><option>1</option><option>2</option></select></label>
+  <p class="hint">Trên cân: Comm1 → Continuous hoặc Stable → Baud 9600 → Protocol 0. Cắm RS232 1# qua USB-RS232 vào Windows.</p>
+</div><div class="divider"></div><label>Chế độ xuất dữ liệu<select name="outputMode"><option value="keyboard">Nhập như bàn phím (Excel/Web)</option><option value="api">Gửi HTTPS API</option><option value="both">Bàn phím + HTTPS API</option><option value="none">Chỉ xem kg / Debug</option></select></label><div id="keyboardSettings"><label>Kiểu nhập bàn phím<select name="keyboardTrigger"><option value="hotkey">Thủ công – Ctrl + Alt + W</option><option value="stable">Tự nhập một lần khi cân ổn định</option></select></label><div class="fieldrow"><label>Chờ ổn định thêm (ms)<input name="stableMs" type="number" min="0" required></label><label>Đặt lại khi kg ≤<input name="resetBelowKg" type="number" min="0" step="0.001" required></label></div><label class="check"><input type="checkbox" name="autoEnter"> Gửi Enter sau khi nhập</label></div><div class="fieldrow"><label>Kg tối thiểu hợp lệ<input name="minWeightKg" type="number" min="0" step="0.001" required></label><label>Sai số thay đổi (kg)<input name="deltaKg" type="number" min="0" step="0.001" required></label></div><label>Hết hạn dữ liệu sau (ms)<input name="staleMs" type="number" min="500" required></label><div id="apiSettings"><div class="divider"></div><h3>Đẩy dữ liệu lên API</h3><label>URL (HTTPS)<input name="apiUrl" type="url" placeholder="https://example.com/api/scales/weight"></label><label>Bearer Token<input name="apiToken" type="password" autocomplete="off" placeholder="Token bí mật"></label><div class="fieldrow"><label>Mã cân<input name="scaleId" required></label><label>Chu kỳ tối thiểu (ms)<input name="apiMinIntervalMs" type="number" min="0" required></label></div></div><label class="check"><input type="checkbox" name="startMinimized"> Chạy ẩn ở System Tray khi mở</label>
+<div class="fieldrow" style="margin-bottom:10px">
+  <button type="button" class="btn-test" id="btnTestConnection">🔍 Kiểm tra kết nối</button>
+  <button class="primary" type="submit">Lưu cấu hình & Áp dụng</button>
+</div>
+<div id="testBox" class="test-result-box" hidden>
+  <div class="test-header">
+    <strong id="testTitle">Kiểm tra kết nối</strong>
+    <span id="testBadge" class="test-badge">Đang chạy</span>
+  </div>
+  <div id="testMessage" class="test-message"></div>
+  <div id="testSamplesContainer" class="test-samples" hidden>
+    <div class="small-muted" style="margin-bottom:4px">Mẫu dữ liệu nhận được (RAW):</div>
+    <pre id="testSamplesPre"></pre>
+  </div>
+  <ul id="testSuggestionsList" class="test-suggestions" hidden></ul>
+</div>
+<div id="saveStatus" role="status"></div></form>
+</div></main><footer>FOSO · Đọc dữ liệu RS232 hoặc TCP dạng ASCII · Giao thức cần kiểm tra với cân thực tế</footer></div>
+<script src="renderer.js"></script></body></html>

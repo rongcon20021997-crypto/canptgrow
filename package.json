@@ -1,0 +1,45 @@
+{
+  "name": "foso-scale-connector",
+  "version": "1.0.0",
+  "description": "Windows RS232 or TCP scale receiver with keyboard wedge and HTTPS forwarding",
+  "main": "src/main.js",
+  "author": "FOSO",
+  "license": "UNLICENSED",
+  "scripts": {
+    "start": "electron .",
+    "build:win": "electron-builder --win nsis",
+    "build:portable": "electron-builder --win portable",
+    "postinstall": "electron-builder install-app-deps"
+  },
+  "devDependencies": {
+    "electron": "^35.7.5",
+    "electron-builder": "^26.0.12"
+  },
+  "build": {
+    "appId": "vn.foso.scaleconnector",
+    "productName": "FOSO Scale Connector",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "src/**/*",
+      "assets/**/*",
+      "package.json"
+    ],
+    "asar": true,
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "artifactName": "FOSO-Scale-Connector-${version}-${arch}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true
+    }
+  },
+  "dependencies": {
+    "serialport": "^12.0.0"
+  }
+}
